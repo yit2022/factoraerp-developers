@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Errors · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html">Getting started</a><a href="authentication.html">Authentication</a><a href="endpoints.html">Endpoints</a><a href="pagination.html">Pagination</a><a href="errors.html" class="active">Errors</a><a href="webhooks.html">Webhooks</a><a href="changelog.html">Changelog</a></nav><main><h1>Errors</h1>
+<p>Errors return a JSON body of <code>{"ok": false, "error": "&lt;message&gt;"}</code>.</p>
+<table><tr><th>Status</th><th><code>error</code></th><th>Cause</th></tr>
+<tr><td>401</td><td>Missing API key</td><td>No key, or the value doesn't start with <code>fxk_</code>.</td></tr>
+<tr><td>401</td><td>Send the key in the Authorization (Bearer) or X-API-Key header</td><td>The request had an <code>api_key</code> query parameter.</td></tr>
+<tr><td>401</td><td>Invalid, expired or revoked API key</td><td>Unknown, expired or revoked key.</td></tr>
+<tr><td>403</td><td>This key lacks the read:… scope</td><td>The key lacks the scope for this endpoint.</td></tr>
+<tr><td>400</td><td>limit and before must be numbers</td><td>Bad paging parameters.</td></tr>
+<tr><td>404</td><td>Not found</td><td>Unknown resource.</td></tr></table>
+<p>Requests to paths outside the four documented endpoints may get a plain-text 404 from the platform rather than JSON. Unexpected server errors return 5xx; retry with backoff.</p>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>

@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Endpoints · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html">Getting started</a><a href="authentication.html">Authentication</a><a href="endpoints.html" class="active">Endpoints</a><a href="pagination.html">Pagination</a><a href="errors.html">Errors</a><a href="webhooks.html">Webhooks</a><a href="changelog.html">Changelog</a></nav><main><h1>Endpoints</h1>
+<p>All endpoints are <code>GET</code>, return JSON with <code>Cache-Control: no-store</code>, and return the newest records first. List endpoints accept <code>limit</code> and <code>before</code> (see <a href="pagination.html">Pagination</a>). A field is omitted when the record has no value for it.</p>
+<h2 id="me">GET /api/v1/me</h2><p>Checks a key and shows what it can do.</p>
+<pre><code class="json">{&quot;ok&quot;:true,&quot;organizationId&quot;:&quot;&lt;factory id&gt;&quot;,&quot;scopes&quot;:[&quot;read:customers&quot;]}</code></pre>
+<h2 id="customers">GET /api/v1/customers</h2><p>Scope <code>read:customers</code>.</p>
+<table><tr><th>Field</th><th>Notes</th></tr><tr><td><code>id</code></td><td>FactoraERP record id</td></tr><tr><td><code>customerCode</code></td><td></td></tr><tr><td><code>name</code></td><td></td></tr><tr><td><code>email</code></td><td></td></tr><tr><td><code>phone</code></td><td></td></tr><tr><td><code>taxPin</code></td><td>KRA PIN</td></tr><tr><td><code>status</code></td><td></td></tr><tr><td><code>_creationTime</code></td><td>Creation time, ms since epoch. Used for paging.</td></tr></table>
+<h2 id="inventory">GET /api/v1/inventory-items</h2><p>Scope <code>read:inventory</code>.</p>
+<table><tr><th>Field</th><th>Notes</th></tr><tr><td><code>id</code></td><td>FactoraERP record id</td></tr><tr><td><code>code</code></td><td></td></tr><tr><td><code>name</code></td><td></td></tr><tr><td><code>unit</code></td><td></td></tr><tr><td><code>category</code></td><td></td></tr><tr><td><code>isActive</code></td><td>boolean</td></tr><tr><td><code>currentStock</code></td><td>number</td></tr><tr><td><code>reorderLevel</code></td><td>number</td></tr><tr><td><code>_creationTime</code></td><td>Creation time, ms since epoch. Used for paging.</td></tr></table>
+<h2 id="sales">GET /api/v1/sales-invoices</h2><p>Scope <code>read:sales</code>.</p>
+<table><tr><th>Field</th><th>Notes</th></tr><tr><td><code>id</code></td><td>FactoraERP record id</td></tr><tr><td><code>invoiceNumber</code></td><td></td></tr><tr><td><code>buyerName</code></td><td></td></tr><tr><td><code>issuedDate</code></td><td></td></tr><tr><td><code>dueDate</code></td><td></td></tr><tr><td><code>status</code></td><td></td></tr><tr><td><code>currency</code></td><td></td></tr><tr><td><code>totalAmount</code></td><td>number</td></tr><tr><td><code>amountPaid</code></td><td>number</td></tr><tr><td><code>etimsStatus</code></td><td>KRA eTIMS submission status</td></tr><tr><td><code>_creationTime</code></td><td>Creation time, ms since epoch. Used for paging.</td></tr></table>
+<h2>Example</h2>
+<pre><code class="sh">curl -H &quot;X-API-Key: $FACTORA_API_KEY&quot; &quot;https://brazen-raven-302.convex.site/api/v1/sales-invoices?limit=2&quot;</code></pre>
+<pre><code class="json">{
+  &quot;ok&quot;: true,
+  &quot;data&quot;: [
+    {&quot;id&quot;: &quot;&lt;id&gt;&quot;, &quot;invoiceNumber&quot;: &quot;&lt;number&gt;&quot;, &quot;buyerName&quot;: &quot;&lt;name&gt;&quot;, &quot;status&quot;: &quot;&lt;status&gt;&quot;, &quot;currency&quot;: &quot;KES&quot;, &quot;totalAmount&quot;: 0, &quot;amountPaid&quot;: 0, &quot;_creationTime&quot;: 1793000000000.0},
+    {&quot;id&quot;: &quot;&lt;id&gt;&quot;, &quot;invoiceNumber&quot;: &quot;&lt;number&gt;&quot;, &quot;...&quot;: &quot;...&quot;, &quot;_creationTime&quot;: 1792900000000.0}
+  ],
+  &quot;nextBefore&quot;: 1792900000000.0
+}</code></pre>
+<p class="muted">Values above are placeholders, not real data.</p>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>

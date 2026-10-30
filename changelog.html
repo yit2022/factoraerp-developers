@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Changelog · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html">Getting started</a><a href="authentication.html">Authentication</a><a href="endpoints.html">Endpoints</a><a href="pagination.html">Pagination</a><a href="errors.html">Errors</a><a href="webhooks.html">Webhooks</a><a href="changelog.html" class="active">Changelog</a></nav><main><h1>Changelog</h1>
+<h2>v1 · October 2026</h2>
+<ul><li>Per-factory API keys (<code>fxk_</code>) with scopes, expiry and revocation.</li>
+<li>Read-only endpoints: <code>/api/v1/me</code>, <code>/customers</code>, <code>/inventory-items</code>, <code>/sales-invoices</code>, with <code>limit</code>/<code>before</code> paging.</li>
+<li>Signed webhooks (<code>X-Factora-Signature</code>, HMAC-SHA256), in dry-run mode.</li></ul>
+<h2>Coming soon</h2><ul><li><code>https://api.factoraerp.com</code> base URL.</li><li>Live webhook delivery and the sales invoice and work order events.</li></ul>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>

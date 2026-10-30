@@ -1,0 +1,73 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Webhooks · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html">Getting started</a><a href="authentication.html">Authentication</a><a href="endpoints.html">Endpoints</a><a href="pagination.html">Pagination</a><a href="errors.html">Errors</a><a href="webhooks.html" class="active">Webhooks</a><a href="changelog.html">Changelog</a></nav><main><h1>Webhooks</h1>
+<div class="note"><b>Dry-run mode.</b> Webhook delivery is not switched on yet. Each event is signed and recorded in the delivery log in System Settings → API access with status <code>DRY RUN</code>, but nothing is sent to your URL. You can build and test your receiver now with the examples below.</div>
+<h2>Endpoints</h2>
+<ul><li>Admins add a webhook URL in <b>System Settings → API access</b> and choose its events. The URL must be a public <code>https://</code> address.</li>
+<li>A signing secret starting with <code>whsec_</code> is shown <b>once</b>. Afterwards only its first 8 characters are shown.</li>
+<li>New endpoints start switched off; admins switch each one on. Up to 10 active endpoints per factory.</li>
+<li><b>Send test</b> emits a <code>test.ping</code> event.</li></ul>
+<h2>Events</h2>
+<table><tr><th>Event</th><th>Status</th></tr>
+<tr><td><code>test.ping</code></td><td>Available (from Send test). <code>data</code> is <code>{"hello":"factora"}</code>.</td></tr>
+<tr><td><code>sales_invoice.created</code></td><td>Reserved, not emitted yet</td></tr>
+<tr><td><code>sales_invoice.paid</code></td><td>Reserved, not emitted yet</td></tr>
+<tr><td><code>work_order.completed</code></td><td>Reserved, not emitted yet</td></tr></table>
+<h2>Request</h2>
+<p>When delivery is live, FactoraERP sends a <code>POST</code> with a 10-second timeout and these headers:</p>
+<pre><code class="">Content-Type: application/json
+X-Factora-Event: test.ping
+X-Factora-Signature: t=1793000000,v1=5f2b...e9</code></pre>
+<pre><code class="json">{&quot;event&quot;:&quot;test.ping&quot;,&quot;createdAt&quot;:&quot;2026-10-31T09:00:00.000Z&quot;,&quot;data&quot;:{&quot;hello&quot;:&quot;factora&quot;}}</code></pre>
+<p>Respond with any 2xx status to mark the delivery sent. Anything else, or a timeout, marks it failed. There are no automatic retries at the moment.</p>
+<h2>Verifying the signature</h2>
+<ol><li>Split <code>X-Factora-Signature</code> on commas to get <code>t</code> (Unix seconds) and <code>v1</code>.</li>
+<li>Build the signed string: <code>t + "." + rawBody</code>, where <code>rawBody</code> is the exact request body.</li>
+<li>Compute HMAC-SHA256 of that string with your <code>whsec_…</code> secret (the whole string, prefix included) as the key, hex-encoded in lowercase.</li>
+<li>Compare with <code>v1</code> in constant time, and reject old timestamps (we suggest 5 minutes).</li></ol>
+<h3>Node.js</h3><pre><code class="js">import crypto from &quot;node:crypto&quot;;
+import express from &quot;express&quot;;
+
+const app = express();
+// Use the raw body: the signature covers the exact bytes sent.
+app.post(&quot;/factora/webhook&quot;, express.raw({ type: &quot;application/json&quot; }), (req, res) =&gt; {
+  const header = req.get(&quot;X-Factora-Signature&quot;) || &quot;&quot;;
+  const parts = Object.fromEntries(header.split(&quot;,&quot;).map((p) =&gt; p.split(&quot;=&quot;)));
+  const t = parts.t, v1 = parts.v1 || &quot;&quot;;
+  const body = req.body.toString(&quot;utf8&quot;);
+  const expected = crypto
+    .createHmac(&quot;sha256&quot;, process.env.FACTORA_WEBHOOK_SECRET) // whsec_...
+    .update(`${t}.${body}`)
+    .digest(&quot;hex&quot;);
+  const ok = v1.length === expected.length &amp;&amp;
+    crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expected));
+  const fresh = Math.abs(Date.now() / 1000 - Number(t)) &lt; 300; // 5-minute tolerance
+  if (!ok || !fresh) return res.status(400).send(&quot;bad signature&quot;);
+  const event = JSON.parse(body);
+  console.log(event.event, event.data);
+  res.sendStatus(200);
+});
+app.listen(3000);</code></pre>
+<h3>Python</h3><pre><code class="py">import hashlib, hmac, os, time
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+SECRET = os.environ[&quot;FACTORA_WEBHOOK_SECRET&quot;].encode()  # whsec_...
+
+@app.post(&quot;/factora/webhook&quot;)
+def webhook():
+    header = request.headers.get(&quot;X-Factora-Signature&quot;, &quot;&quot;)
+    parts = dict(p.split(&quot;=&quot;, 1) for p in header.split(&quot;,&quot;) if &quot;=&quot; in p)
+    t, v1 = parts.get(&quot;t&quot;, &quot;&quot;), parts.get(&quot;v1&quot;, &quot;&quot;)
+    body = request.get_data(as_text=True)  # raw body, unmodified
+    expected = hmac.new(SECRET, f&quot;{t}.{body}&quot;.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(v1, expected):
+        abort(400)
+    if not t.isdigit() or abs(time.time() - int(t)) &gt; 300:
+        abort(400)
+    event = request.get_json()
+    print(event[&quot;event&quot;], event[&quot;data&quot;])
+    return &quot;&quot;, 200</code></pre>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>

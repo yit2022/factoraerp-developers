@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Getting started · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html" class="active">Getting started</a><a href="authentication.html">Authentication</a><a href="endpoints.html">Endpoints</a><a href="pagination.html">Pagination</a><a href="errors.html">Errors</a><a href="webhooks.html">Webhooks</a><a href="changelog.html">Changelog</a></nav><main><h1>Getting started</h1>
+<p class="lead">The FactoraERP API gives your systems read-only access to one factory's customers, inventory items and sales invoices, plus signed webhooks for key events.</p>
+<div class="note">API v1 is <b>read-only</b>. Webhook delivery is currently in <b>dry-run mode</b>: events are signed and logged but not sent.</div>
+<h2>Base URL</h2>
+<table><tr><th>Status</th><th>URL</th></tr><tr><td>Current</td><td><code>https://brazen-raven-302.convex.site</code></td></tr><tr><td>Coming soon</td><td><code>https://api.factoraerp.com</code></td></tr></table>
+<h2>Quick start</h2>
+<ol><li>A factory admin (Admin, CEO/Director or General Manager role) opens <b>System Settings → API access</b> in FactoraERP.</li>
+<li>They create a key, choose its scopes and expiry, and copy it. The key starts with <code>fxk_</code> and is <b>shown only once</b>.</li>
+<li>Call the API with the key in a header:</li></ol>
+<pre><code class="sh">curl -H &quot;Authorization: Bearer $FACTORA_API_KEY&quot; https://brazen-raven-302.convex.site/api/v1/me</code></pre>
+<pre><code class="json">{&quot;ok&quot;:true,&quot;organizationId&quot;:&quot;&lt;factory id&gt;&quot;,&quot;scopes&quot;:[&quot;read:customers&quot;,&quot;read:sales&quot;]}</code></pre>
+<h2>What's available</h2>
+<table><tr><th>Endpoint</th><th>Scope</th></tr>
+<tr><td><code>GET /api/v1/me</code></td><td>any valid key</td></tr>
+<tr><td><code>GET /api/v1/customers</code></td><td><code>read:customers</code></td></tr>
+<tr><td><code>GET /api/v1/inventory-items</code></td><td><code>read:inventory</code></td></tr>
+<tr><td><code>GET /api/v1/sales-invoices</code></td><td><code>read:sales</code></td></tr></table>
+<p>The API is designed for server-to-server use. It sends no CORS headers, so browsers will block calls from web pages. Keep keys on your server.</p>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>

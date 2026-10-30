@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pagination · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html">Getting started</a><a href="authentication.html">Authentication</a><a href="endpoints.html">Endpoints</a><a href="pagination.html" class="active">Pagination</a><a href="errors.html">Errors</a><a href="webhooks.html">Webhooks</a><a href="changelog.html">Changelog</a></nav><main><h1>Pagination</h1>
+<table><tr><th>Parameter</th><th>Default</th><th>Notes</th></tr>
+<tr><td><code>limit</code></td><td>50</td><td>Rounded down and clamped to 1–200.</td></tr>
+<tr><td><code>before</code></td><td>none</td><td>Return records created strictly before this <code>_creationTime</code>.</td></tr></table>
+<p>Each list response has <code>nextBefore</code>. When it is a number, pass it as <code>before</code> to get the next page. When it is <code>null</code>, you've reached the end. <code>nextBefore</code> is set whenever a page is full, so the last page can occasionally be empty.</p>
+<p>Non-numeric <code>limit</code> or <code>before</code> returns 400.</p>
+<pre><code class="js">// Node 18+
+const base = &quot;https://brazen-raven-302.convex.site/api/v1/customers&quot;;
+let before = null, all = [];
+do {
+  const url = before ? `${base}?limit=200&amp;before=${before}` : `${base}?limit=200`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${process.env.FACTORA_API_KEY}` } });
+  const page = await res.json();
+  if (!page.ok) throw new Error(page.error);
+  all.push(...page.data);
+  before = page.nextBefore;
+} while (before !== null);</code></pre>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>

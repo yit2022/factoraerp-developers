@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Authentication · FactoraERP Developers</title><meta name="description" content="FactoraERP public API and webhooks documentation.">
+<link rel="stylesheet" href="assets/style.css"><link rel="icon" href="assets/favicon.svg"></head><body>
+<header class="top"><a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="26" height="26"> FactoraERP <span>Developers</span></a><a class="ext" href="https://factoraerp.com">factoraerp.com →</a></header>
+<div class="wrap"><nav class="side"><a href="index.html">Getting started</a><a href="authentication.html" class="active">Authentication</a><a href="endpoints.html">Endpoints</a><a href="pagination.html">Pagination</a><a href="errors.html">Errors</a><a href="webhooks.html">Webhooks</a><a href="changelog.html">Changelog</a></nav><main><h1>Authentication</h1>
+<h2>API keys</h2>
+<ul><li>Format: <code>fxk_</code> followed by 48 hex characters.</li>
+<li>Created and revoked by factory admins in <b>System Settings → API access</b>.</li>
+<li>Shown once at creation. FactoraERP stores only a SHA-256 hash and the first 12 characters (for example <code>fxk_1a2b3c4d</code>) so you can tell keys apart. A lost key can't be recovered: revoke it and create a new one.</li>
+<li>Each key belongs to one factory and can only read that factory's data.</li>
+<li>Up to 20 active keys per factory.</li>
+<li>Expiry: 30, 90 (default) or 365 days, or never. Expired and revoked keys stop working immediately.</li>
+<li>The admin screen shows when a key was last used (updated at most once an hour).</li></ul>
+<h2>Scopes</h2>
+<table><tr><th>Scope</th><th>Grants</th></tr><tr><td><code>read:customers</code></td><td><code>GET /api/v1/customers</code></td></tr><tr><td><code>read:inventory</code></td><td><code>GET /api/v1/inventory-items</code></td></tr><tr><td><code>read:sales</code></td><td><code>GET /api/v1/sales-invoices</code></td></tr></table>
+<h2>Sending the key</h2>
+<p>Use either header:</p>
+<pre><code class="sh">curl -H &quot;Authorization: Bearer fxk_...&quot; https://brazen-raven-302.convex.site/api/v1/me
+curl -H &quot;X-API-Key: fxk_...&quot; https://brazen-raven-302.convex.site/api/v1/me</code></pre>
+<p>If both are present, <code>Authorization</code> wins. Never put the key in the URL: a request with an <code>api_key</code> query parameter is refused with 401 so keys don't leak into logs.</p>
+<h2>Keeping keys safe</h2>
+<ul><li>Store keys in a secrets manager or environment variable, never in source code or front-end apps.</li><li>Give each integration its own key with only the scopes it needs.</li><li>Prefer an expiry and rotate keys before they lapse.</li></ul>
+<footer>© Tamalaki Business Network Ltd · FactoraERP API v1</footer></main></div></body></html>
